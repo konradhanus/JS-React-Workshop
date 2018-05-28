@@ -1,0 +1,115 @@
+<html>
+
+<head>
+   
+
+</head>
+
+<body>
+    <div style="width: 600px; height: 600px; background-color: black; position:relative">
+        <div id="player" style="width: 10px; height: 10px; background-color: white; position: absolute; top: 20px; left: 20px;">
+
+        </div>
+
+    </div>
+	<script src="https://www.gstatic.com/firebasejs/5.0.3/firebase.js"></script>
+	<script>
+	  // Initialize Firebase
+	  
+        const playerClass = function () {
+            
+            this.root = document.getElementById('player');
+            this.position = [10,20];
+
+            this.goUp = function () {
+                console.log(this.root.style.top);
+                this.root.style.top = +this.root.style.top.replace('px','') - 10;
+				this.sendPosition();
+            }
+
+            this.goDown = function () {
+                console.log('goDown');
+                this.root.style.top = +this.root.style.top.replace('px','') + 10;
+				this.sendPosition();
+            }
+
+            this.goLeft = function () {
+                console.log('GoLeft');
+                this.root.style.left = +this.root.style.left.replace('px','') - 10;
+				this.sendPosition();
+            }
+
+            this.goRight = function () {
+                console.log('goright');
+                this.root.style.left = +this.root.style.left.replace('px','') + 10;
+				this.sendPosition();
+            }
+			
+			this.setPosition = function(left, top){
+			 player.position = [left,top];
+			 this.root.style.left = left;
+			 this.root.style.top = top;
+			 
+			}
+			
+			this.sendPosition = function(){
+				this.position = [this.root.style.top, this.root.style.left];
+				console.log(this.position);
+				
+				firebase.database().ref('players/').set([{
+					left: this.root.style.left,
+					top: this.root.style.top,
+				}]);
+			}
+        }
+
+        let player = new playerClass;
+		
+		var config = {
+			apiKey: "AIzaSyBepxN3nu72V29OiDRVYzRMm0pW-OCkw5Y",
+			authDomain: "snakeneverdieonline.firebaseapp.com",
+			databaseURL: "https://snakeneverdieonline.firebaseio.com",
+			projectId: "snakeneverdieonline",
+			storageBucket: "",
+			messagingSenderId: "929020635203"
+		};
+		firebase.initializeApp(config);
+		
+		var position;
+		var dbRef = firebase.database().ref().child('players');
+		dbRef.on('value', snap => {
+			player.setPosition(snap.val()[0].left,snap.val()[0].top);			
+		});
+		
+		
+		 
+		
+       
+        
+        function keyDownTextField(e) {
+            var keyCode = e.keyCode;
+
+            if (keyCode == 38) {
+                player.goUp();
+            }
+
+            if (keyCode == 39) {
+                player.goRight();
+            }
+
+            if (keyCode == 40) {
+                player.goDown();
+            }
+
+            if (keyCode == 37) {
+                player.goLeft();
+            }
+        }
+
+        document.addEventListener("keydown", keyDownTextField, false);
+
+    </script>
+
+</body>
+
+</html>
